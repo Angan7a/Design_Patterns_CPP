@@ -3,13 +3,13 @@ using namespace std;
 
 class Pizza {
 protected:
-//    string name;
+    string name;
     double price;
     string ciasto;
     string sos;
     string dodatki;
 public:
-//    void setName(string newName) { name = newName; }
+    void setName(string newName) { name = newName; }
     void setCiasto(string newCiasto) { ciasto = newCiasto; }
     void setSos(string newSos) { sos = newSos; }
     void setDodatki(string newDodatki) { dodatki = newDodatki; }
@@ -17,13 +17,11 @@ public:
     double getPrice() { return price; }
 
     void showPizza() {
-//        cout << "Pizza: " << name << endl;
+        cout << "Pizza: " << name << endl;
         cout << "Price: " << price << endl;
-         cout << "asda" << endl;
-
         cout << "Dough: " << ciasto << endl;
         cout << "Sauce: " << sos << endl;
-        cout << "Topping: " << dodatki << endl;
+        cout << "Topping: " << dodatki << endl << endl;
     }
 };
 
@@ -31,10 +29,11 @@ public:
 //Abstarct Builder
 class PizzaBuilder {
 protected:
-    Pizza *pizza = new Pizza;
+    Pizza *pizza = new Pizza();
 public:
-//    Pizza* createNewPizza() { return new Pizza(); }
     Pizza* getPizza() { return pizza; }
+    virtual void buildName() = 0;
+    virtual void buildPrice() = 0;
     virtual void buildCiasto() = 0;
     virtual void buildSos() = 0;
     virtual void buildDodatki() = 0;
@@ -44,12 +43,16 @@ public:
 
 class PizzaHawaii : public PizzaBuilder {
 public:
+    void buildName() { pizza->setName("Hawaii"); }
+    void buildPrice() { pizza->setPrice(5.60); }
     void buildCiasto() { pizza->setCiasto("cross"); }
     void buildSos() { pizza->setSos("mild"); }
     void buildDodatki() { pizza->setDodatki("ham and pineapple"); }
 };
 
 class PizzaPepperoni : public PizzaBuilder {
+    void buildName() { pizza->setName("Pepperoni"); }
+    void buildPrice() { pizza->setPrice(5.40); }
     void buildCiasto() { pizza->setCiasto("pan baked"); }
     void buildSos() { pizza->setSos("hot"); }
     void buildDodatki() { pizza->setDodatki("pepperoni and salami"); }
@@ -63,9 +66,9 @@ public:
     Pizza* getPizza() { return pizzaBuilder->getPizza(); }
 
     void constuctPizza() {
-//        pizzaBuilder = new PizzaHawaii();
+        pizzaBuilder->buildName();
+        pizzaBuilder->buildPrice();
         pizzaBuilder->buildCiasto();
-        cout <<"I'm making SOS" <<endl;
         pizzaBuilder->buildSos();
         pizzaBuilder->buildDodatki();
     }
@@ -83,7 +86,9 @@ public:
     PizzaBuilder* makePizza(string namePizza) {
         if (namePizza == "PizzaHawaii") {
             return new PizzaHawaii();
-       } else return new PizzaHawaii();
+        } else {
+            return new PizzaPepperoni();
+        }
     }
 };
 
@@ -92,16 +97,20 @@ public:
 int main()
 {
     Waiter waiter;
-    FactoryPizza *fP = new MyFactoryPizza();
-    PizzaBuilder *pi = fP->makePizza("PizzaHawaii");
-    waiter.setPizzaBuilder(pi);
+    FactoryPizza *factoryPizza = new MyFactoryPizza();
+    //make Pizza Hawaii
+    PizzaBuilder *pizzaOrdered = factoryPizza->makePizza("PizzaHawaii");
+    waiter.setPizzaBuilder(pizzaOrdered);
     waiter.constuctPizza();
-//    pi->buildCiasto();
-//    PizzaHawaii *hawaiiBuilder;
-//    waiter.setPizzaBuilder(hawaiiBuilder);
-    Pizza *p = waiter.getPizza();
-    p->showPizza();
-//    waiter.constuctPizza();
+    Pizza *pizza = waiter.getPizza();
+    pizza->showPizza();
+    //make Pizza Pepperoni
+    pizzaOrdered = factoryPizza->makePizza("PizzaPepperoni");
+    waiter.setPizzaBuilder(pizzaOrdered);
+    waiter.constuctPizza();
+    pizza = waiter.getPizza();
+    pizza->showPizza();
+
 
 return 0;
 }
