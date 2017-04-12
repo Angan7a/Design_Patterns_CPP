@@ -10,6 +10,7 @@ public:
      EntertainmentDevice() : volumeLevel(0) {}
      virtual void buttonFivePressed() = 0;
      virtual void buttonSixPressed() = 0;
+     virtual void pausedDevice() = 0;
 
      void deviceFeedback() {
          if (deviceState > maxSetting || deviceState < 0) { deviceState = 0; }
@@ -23,6 +24,10 @@ public:
           volumeLevel--;
           cout << "Voulme at: " << volumeLevel << endl;
      }
+     void mutedDevice() {
+         cout << "Device was Muted" << endl;
+     }
+
 
 };
 
@@ -40,6 +45,10 @@ public:
          cout << "Chanel Up" << endl;
          deviceState++;
      }
+     void pausedDevice(){
+        cout << "TV was Paused" << endl;
+     }
+
 };
 
 class DVDDevice : public EntertainmentDevice {
@@ -56,6 +65,10 @@ public:
          cout << "Next Move" << endl;
          deviceState++;
      }
+     void pausedDevice() {
+         cout << "DVD was Paused" << endl;
+     }
+
 };
 
 class RemoteButton {
@@ -72,6 +85,8 @@ public:
     void deviceFeedback() {
         theDevice->deviceFeedback();
     }
+    EntertainmentDevice* getDevice() { return theDevice; }
+
     virtual void buttonNinePressed() = 0;
 };
 
@@ -79,7 +94,7 @@ class TVRemoteMute : public RemoteButton {
 public:
     TVRemoteMute(EntertainmentDevice *newDevice) : RemoteButton(newDevice){ }
     void buttonNinePressed() {
-        cout << "TV was Muted" << endl;
+        getDevice()->mutedDevice();
     }
 };
 
@@ -87,22 +102,21 @@ class TVRemotePause : public RemoteButton {
 public:
     TVRemotePause(EntertainmentDevice *newDevice) : RemoteButton(newDevice){ }
     void buttonNinePressed() {
-        cout << "TV was Paused" << endl;
+        getDevice()->pausedDevice();
     }
 };
 
 int main()
 {
-
       RemoteButton *theTV = new TVRemoteMute(new TVDevice(1, 200));
       RemoteButton *theTV2 = new TVRemotePause(new TVDevice(1, 200));
       RemoteButton *theDVD = new TVRemoteMute(new DVDDevice(2, 4));
+      RemoteButton *theDVD2 = new TVRemotePause(new DVDDevice(2, 4));
       cout << "Test TV with Mute" << endl;
       theTV->buttonFivePressed();
       theTV->buttonSixPressed();
       theTV->buttonNinePressed();
       theTV->deviceFeedback();
-
 
       cout << "\nTest TV with Pause" << endl;
       theTV2->buttonFivePressed();
@@ -120,8 +134,14 @@ int main()
       theDVD->buttonNinePressed();
       theDVD->deviceFeedback();
 
+      cout << "\nTest DVD with Pause" << endl;
+      theDVD2->buttonFivePressed();
+      theDVD2->buttonNinePressed();
+      theDVD2->deviceFeedback();
 
       delete theTV;
       delete theTV2;
+      delete theDVD;
+      delete theDVD2;
 return 0;
 }
